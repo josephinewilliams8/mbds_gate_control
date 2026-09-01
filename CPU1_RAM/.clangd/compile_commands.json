@@ -1,0 +1,17 @@
+[
+   {
+      "directory" : "C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/CPU1_RAM",
+      "command"   : "clang++ -I\"C:/Users/coday/workspace_ccstheia/interrupt_ex1_external\" -I\"C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/device\" -I\"C:/ti/c2000/C2000Ware_26_01_00_00/driverlib/f2837xd/driverlib/\" -I\"C:/ti/ccs2100/ccs/tools/compiler/ti-cgt-c2000_25.11.1.LTS/include\" -DDEBUG -DCPU1 -I\"C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/CPU1_RAM/syscfg\"",
+      "file"      : "C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/device/F2837xD_CodeStartBranch.asm"
+   },
+   {
+      "directory" : "C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/CPU1_RAM",
+      "command"   : "clang++ -I\"C:/Users/coday/workspace_ccstheia/interrupt_ex1_external\" -I\"C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/device\" -I\"C:/ti/c2000/C2000Ware_26_01_00_00/driverlib/f2837xd/driverlib/\" -I\"C:/ti/ccs2100/ccs/tools/compiler/ti-cgt-c2000_25.11.1.LTS/include\" -DDEBUG -DCPU1 -I\"C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/CPU1_RAM/syscfg\" -xc",
+      "file"      : "C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/device/device.c"
+   },
+   {
+      "directory" : "C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/CPU1_RAM",
+      "command"   : "clang++ -I\"C:/Users/coday/workspace_ccstheia/interrupt_ex1_external\" -I\"C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/device\" -I\"C:/ti/c2000/C2000Ware_26_01_00_00/driverlib/f2837xd/driverlib/\" -I\"C:/ti/ccs2100/ccs/tools/compiler/ti-cgt-c2000_25.11.1.LTS/include\" -DDEBUG -DCPU1 -I\"C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/CPU1_RAM/syscfg\" -xc",
+      "file"      : "C:/Users/coday/workspace_ccstheia/interrupt_ex1_external/interrupt_ex1_external.c"
+   }
+]
