@@ -1,3 +1,4 @@
+// code for f28379d
 #include "driverlib.h"
 #include "device.h"
 #include "board.h"
@@ -5,8 +6,7 @@
 // Prototype for Timer 0 ISR
 __interrupt void cpuTimer0ISR(void);
 
-// setting to xint4 to avoid potential conflict with xbar, might be able to just put
-// to xint2
+// settup up XINT2 for setting off xbar triggers for pwm transitions
 interrupt void xint2_isr(void);
 
 // bare bones pwm signal
@@ -23,22 +23,22 @@ void main(void)
    Device_initGPIO();
     
    // Configure GPIO 4 as an output pin
-   GPIO_setPadConfig(4, GPIO_PIN_TYPE_STD);
+   GPIO_setPadConfig(4, GPIO_PIN_TYPE_STD);             // output 4
    GPIO_setDirectionMode(4, GPIO_DIR_MODE_OUT);
    GPIO_writePin(4, 1);
 
    // Configure GPIO 31 as an output pin
-   GPIO_setPadConfig(31, GPIO_PIN_TYPE_STD);
+   GPIO_setPadConfig(31, GPIO_PIN_TYPE_STD);            // output 31
    GPIO_setDirectionMode(31, GPIO_DIR_MODE_OUT);
    GPIO_writePin(31, 0);
 
    // Configure GPIO 34 as an output pin
-   GPIO_setPadConfig(34, GPIO_PIN_TYPE_STD);
+   GPIO_setPadConfig(34, GPIO_PIN_TYPE_STD);            // output 34
    GPIO_setDirectionMode(34, GPIO_DIR_MODE_OUT);
    GPIO_writePin(34, 1);
 
 
-   // Initialize PIE and clear PIE registers. Disable CPU interrupts.
+   // Initialize PIE and clear PIE registers.
    Interrupt_initModule();
    Interrupt_initVectorTable();
 
@@ -64,17 +64,17 @@ void main(void)
    EPWM_setSyncOutPulseMode(myEPWM5_BASE, EPWM_SYNC_OUT_PULSE_ON_COUNTER_ZERO);
 
     // config GPIO0 as input to xbar1 for pwm
-   GPIO_setDirectionMode(0, GPIO_DIR_MODE_IN);          // input
+   GPIO_setDirectionMode(0, GPIO_DIR_MODE_IN);          // input 0
    GPIO_setPadConfig(0, GPIO_PIN_TYPE_STD);
    GPIO_setQualificationMode(0, GPIO_QUAL_ASYNC);
 
    // config GPIO1 as input to xbar2 for pwm
-   GPIO_setDirectionMode(1, GPIO_DIR_MODE_IN);          // input
+   GPIO_setDirectionMode(1, GPIO_DIR_MODE_IN);          // input 1
    GPIO_setPadConfig(1, GPIO_PIN_TYPE_STD);
    GPIO_setQualificationMode(1, GPIO_QUAL_ASYNC);
 
    // config GPIO5 as input to sense the 60 hz signal
-   GPIO_setDirectionMode(5, GPIO_DIR_MODE_IN);          // input
+   GPIO_setDirectionMode(5, GPIO_DIR_MODE_IN);          // input 5
    GPIO_setPadConfig(5, GPIO_PIN_TYPE_STD);
    GPIO_setQualificationMode(5, GPIO_QUAL_ASYNC);
  
@@ -99,7 +99,7 @@ void main(void)
    // setting up GPIO interrupt
     GPIO_setInterruptPin(5,GPIO_INT_XINT2);
     GPIO_setInterruptType(GPIO_INT_XINT2, GPIO_INT_TYPE_BOTH_EDGES);
-    // GPIO_setInterruptType(GPIO_INT_XINT4, GPIO_INT_TYPE_FALLING_EDGE);
+    // GPIO_setInterruptType(GPIO_INT_XINT4, GPIO_INT_TYPE_FALLING_EDGE); 
     GPIO_enableInterrupt(GPIO_INT_XINT2);
 
    EDIS;
@@ -107,8 +107,8 @@ void main(void)
    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
 
    // Initialize CPU Timer 0.
-   // Device_SYSCLK_FREQ is typically 200000000 (200MHz)
-   // 60Hz period in microseconds = (1 / 60) * 1,000,000 = 16666.66... microseconds
+   // Device_SYSCLK_FREQ is typically 200000000 (200MHz) but need to confirm
+   // Sets up CPU INT to trigger at a 60Hz frequency
    CPUTimer_setPeriod(CPUTIMER0_BASE, 1666600);
    CPUTimer_setPreScaler(CPUTIMER0_BASE, 0);
  
@@ -121,10 +121,9 @@ void main(void)
    // enable CPU INT1
    Interrupt_enable(INT_TIMER0);
 
-   // enable pin interrupt  
+   // enable pin interrupt that detects when input transitions
+   // this will be the interrupt that goes off with the output from AC ZCD
    Interrupt_enable(INT_XINT2);
-
-   // this will send off if there is an input signal detected
    
    // pwm interrupt
    Interrupt_enable(INT_EPWM2);
@@ -170,16 +169,15 @@ interrupt void xint2_isr(void)
 
 void configurePhase(uint32_t base, uint32_t masterBase, uint16_t phaseVal)
 {
+    // this is from example PWM code from C2000 where there are 3-phase PWMs.
+    // not super relevant to this particular code, but keeping in for any potential
+    // future iterations. 
    uint32_t readPrdVal, phaseRegVal;
 
-   //
-   // Read Period value to calculate value for Phase Register
-   //
+   // Reads period value to calculate value for phase register
    readPrdVal = EPWM_getTimeBasePeriod(masterBase);
 
-   //
-   // Caluclate phase register values based on Time Base counter mode
-   //
+   // caluclates phase register values based on time base counter mode
    if((HWREGH(base + EPWM_O_TBCTL) & 0x3U) == EPWM_COUNTER_MODE_UP_DOWN)
    {
        phaseRegVal = (2U * readPrdVal * phaseVal) / 360U;
